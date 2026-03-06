@@ -498,6 +498,17 @@
 
         .link-item {
             margin: 14px 0;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .link-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .link-item:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .link-meta {
@@ -996,7 +1007,7 @@
                 }
 
                 return `
-      <div style="margin-bottom:10px;">
+      <div class ="link-item">
         <div style="font-size:13px; opacity:0.75; margin-bottom:2px;">
           ${item.remark} ${pingText ? "| " + pingText : ""}
         </div>
