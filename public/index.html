@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLESS Tool</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #1f2937;
+            --accent: #4f46e5;
+            --border: #d1d5db;
+            --success: #16a34a;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .dark {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #ffffff;
+            --border: #444;
+            --accent: #6366f1;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background: var(--card);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        header p {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            opacity: .75;
+        }
+
+        .icon-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            margin: 25px auto;
+            padding: 0 20px 50px 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 180px;
+            resize: vertical;
+        }
+
+        .info-box {
+            background: #e5e7eb;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            opacity: .85;
+            white-space: nowrap;
+        }
+
+        .dark .info-box {
+            background: #2a2a2a;
+        }
+
+        .button-row {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.primary {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: #6b7280;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .output {
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+
+        .scheme {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .ping-box {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .ping-good {
+            color: #16a34a;
+        }
+
+        .ping-medium {
+            color: #eab308;
+        }
+
+        .ping-slow {
+            color: #f97316;
+        }
+
+        .ping-bad {
+            color: #dc2626;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: .3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Info icons */
+
+        .with-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-icon::before,
+        .header-btn::before {
+            content: "";
+        }
+
+        .info-icon::before {
+            content: "ℹ️";
+            font-size: 16px;
+        }
+
+        /* Tooltip */
+
+        .tooltip-box {
+            position: absolute;
+            max-width: 260px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #1e1e2f;
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.4;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: 0.2s ease;
+            z-index: 3000;
+        }
+
+        .tooltip-box.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Desktop / Mobile logic */
+
+        .mobile-actions {
+            display: none;
+        }
+
+        .desktop-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ===== MOBILE ===== */
+
+        @media (max-width:768px) {
+
+            body {
+                font-size: 16px;
+            }
+
+            header {
+                padding: 8px 12px;
+            }
+
+            .header-top {
+                min-height: 44px;
+            }
+
+            header p {
+                display: none;
+            }
+
+            .desktop-actions {
+                display: none;
+            }
+
+            .mobile-actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .header-btn {
+                width: 42px;
+                height: 42px;
+                border-radius: 8px;
+                background: #f0f0f0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                cursor: pointer;
+            }
+
+            .container {
+                margin: 15px auto;
+                padding: 0 15px 40px 15px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 10px;
+            }
+
+            textarea {
+                height: 350px;
+                font-size: 16px;
+            }
+
+            input {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            button.primary,
+            button.secondary,
+            .icon-btn {
+                padding: 10px 12px;
+                font-size: 16px;
+                width: 100%;
+            }
+
+            .button-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .ping-box {
+                width: 100%;
+                margin-top: 8px;
+            }
+
+            .output {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .info-box {
+                display: none !important;
+            }
+        }
+
+        /* ================= INTEGRATED TABS CARD ================= */
+
+        .card>.tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3b82f6;
+            transition: all .15s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== MOBILE ===== */
+
+        @media (max-width:768px) {
+
+            .card>.tabs {
+                margin-bottom: 16px;
+            }
+
+            .button-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .ping-box {
+                width: 100%;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+
+        }
+
+        .builder-section {
+            margin-bottom: 20px;
+        }
+
+        .builder-section h4 {
+            margin-bottom: 10px;
+        }
+
+        .builder-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ===== BUILDER FORM ALIGN ===== */
+
+        .builder-section label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            font-weight: 500;
+        }
+
+        .builder-section input,
+        .builder-section select {
+            margin-top: 6px;
+        }
+
+        /* одинаковая высота текста и иконки */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .builder-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .builder-row input {
+            flex: 1;
+        }
+
+        .builder-row button {
+            width: 46px;
+            height: 46px;
+            padding: 0;
+
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+
+            font-size: 20px;
+        }
+
+        .builder-row button:hover {
+            background: #f3f4f6;
+        }
+
+        .dark .builder-row button:hover {
+            background: #2a2a2a;
+        }
+
+        /* ===== GENERATE BUTTON ANIMATION ===== */
+
+        .rotate {
+            animation: spin .5s linear;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .link-item {
+            margin: 14px 0;
+        }
+
+        .link-meta {
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .remark {
+            opacity: .75;
+        }
+
+        .link-url {
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-top">
+            <h1>⚡ VLESS Tool</h1>
+
+            <!-- Desktop кнопки -->
+            <div class="desktop-actions">
+                <button class="icon-btn" onclick="toggleTheme()">🌓 Тема</button>
+                <button class="icon-btn" onclick="clearAll()">🗑 Очистить все введенные данные</button>
+            </div>
+
+            <!-- Mobile кнопки -->
+            <div class="mobile-actions">
+                <span class="header-btn" onclick="toggleTheme()">🌓</span>
+                <span class="header-btn" onclick="clearAll()">🚮</span>
+                <span class="header-btn"
+                    data-tooltip="Утилита для парсинга outbound-конфигураций Xray/V2Ray/Sing-box и формирования корректных VLESS URI согласно спецификации Xray-core.">
+                    ℹ️
+                </span>
+            </div>
+        </div>
+
+        <p class="header-description">
+            Утилита для парсинга outbound-конфигураций Xray/V2Ray/Sing-box
+            и формирования корректных VLESS URI согласно спецификации Xray-core.
+        </p>
+    </header>
+
+    <div class="container">
+
+        <!-- ЕДИНЫЙ БЛОК ВВОДА С ВКЛАДКАМИ -->
+        <div class="card">
+
+            <!-- ВКЛАДКИ -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tab-json">JSON</button>
+                <button class="tab-btn" data-tab="tab-sub">Subscription</button>
+                <button class="tab-btn" data-tab="tab-builder">Builder</button>
+            </div>
+
+            <!-- ================= JSON ================= -->
+            <div class="tab-content active" id="tab-json">
+
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <h3 class="with-info" style="margin:0;">
+                        JSON Config
+                        <span class="info-icon"
+                            data-tooltip="Вставьте конфигурацию Xray/V2Ray/Sing-box. Утилита автоматически определит формат и сформирует корректную VLESS ссылку.">
+                        </span>
+                    </h3>
+                    <div class="info-box">
+                        ↕ Тяните нижний правый угол для изменения размера окна ввода
+                    </div>
+                </div>
+
+                <textarea id="jsonInput" placeholder="Вставьте JSON конфигурацию..."></textarea>
+
+                <div class="button-row">
+                    <button class="primary" onclick="processJSON()">Сконвертировать JSON</button>
+                    <button class="secondary" onclick="clearJSON()">Очистить JSON</button>
+                </div>
+
+            </div>
+
+            <!-- ================= SUBSCRIPTION ================= -->
+            <div class="tab-content" id="tab-sub">
+
+                <h3 class="with-info">
+                    Subscription URL
+                    <span class="info-icon"
+                        data-tooltip="Вставьте ссылку подписки. Если сервер возвращает base64-список VLESS, утилита извлечёт все ссылки.">
+                    </span>
+                </h3>
+
+                <input id="subUrl" placeholder="https://example.com/sub/abc123">
+
+                <div class="button-row">
+                    <button class="primary" onclick="processSubscription()">Извлечь ссылки</button>
+                    <button class="secondary" onclick="clearSubscription()">Очистить URL</button>
+                </div>
+
+            </div>
+
+            <!-- ================= BUILDER ================= -->
+            <div class="tab-content" id="tab-builder">
+                <h3 class="with-info">
+                    Конструктор VLESS
+                    <span class="info-icon" data-tooltip="Ручная сборка VLESS URI на основе outbound-параметров Xray/V2Ray/Sing-box.
+                        Поддерживается настройка:
+                        UUID, address, port, network, security, flow, SNI, publicKey, shortId, fingerprint и другие query-параметры.
+                        Генерация производится в формате vless:// согласно спецификации Xray-core.">
+                    </span>
+                </h3>
+
+                <!-- ================= ОСНОВНЫЕ ПАРАМЕТРЫ ================= -->
+
+                <div class="builder-section">
+
+                    <h4>Основные параметры</h4>
+
+                    <label>UUID
+                        <span class="info-icon"
+                            data-tooltip="Уникальный идентификатор пользователя. Должен совпадать с inbound → clients → id на сервере.">
+                        </span>
+                    </label>
+
+                    <div class="builder-row">
+                        <input id="b_uuid" placeholder="Вставьте UUID или сгенерируйте">
+                        <button type="button" class="secondary" onclick="generateUUID()"
+                            title="Сгенерировать UUID">🔄</button>
+                    </div>
+
+                    <label>Address
+                        <span class="info-icon" data-tooltip="IP-адрес или доменное имя сервера.">
+                        </span>
+                    </label>
+                    <input id="b_address" placeholder="example.com">
+
+                    <label>Port
+                        <span class="info-icon" data-tooltip="Порт inbound VLESS на сервере.">
+                        </span>
+                    </label>
+                    <input id="b_port" placeholder="443">
+
+                    <label>Remark
+                        <span class="info-icon" data-tooltip="Имя конфигурации, добавляется после # в ссылке.">
+                        </span>
+                    </label>
+                    <input id="b_remark" placeholder="My Server">
+
+                </div>
+
+                <!-- ================= TRANSPORT ================= -->
+
+                <div class="builder-section">
+
+                    <h4>Transport</h4>
+
+                    <label>Network
+                        <span class="info-icon" data-tooltip="Тип транспорта (streamSettings.network).">
+                        </span>
+                    </label>
+
+                    <select id="b_network">
+                        <option value="tcp">tcp</option>
+                        <option value="ws">ws</option>
+                        <option value="grpc">grpc</option>
+                    </select>
+
+                </div>
+
+                <!-- ================= SECURITY ================= -->
+
+                <div class="builder-section">
+
+                    <h4>Security</h4>
+
+                    <label>Security
+                        <span class="info-icon" data-tooltip="Тип шифрования канала (streamSettings.security).">
+                        </span>
+                    </label>
+
+                    <select id="b_security" onchange="toggleRealityFields()">
+                        <option value="none">none</option>
+                        <option value="tls">tls</option>
+                        <option value="reality">reality</option>
+                    </select>
+
+                </div>
+
+                <!-- ================= REALITY ================= -->
+
+                <div class="builder-section" id="reality_block" style="display:none;">
+
+                    <h4>REALITY параметры</h4>
+
+                    <label>Public Key
+                        <span class="info-icon"
+                            data-tooltip="Публичный ключ сервера REALITY (realitySettings.publicKey).">
+                        </span>
+                    </label>
+
+                    <div class="builder-row">
+                        <input id="b_publicKey" placeholder="BASE64 PUBLIC KEY">
+                        <button type="button" class="secondary" onclick="generateRealityKey()"
+                            title="Сгенерировать Public Key">🔄</button>
+                    </div>
+
+                    <label>Short ID
+                        <span class="info-icon" data-tooltip="shortId из realitySettings.">
+                        </span>
+                    </label>
+                    <input id="b_shortId" placeholder="hex short id">
+
+                    <label>SNI
+                        <span class="info-icon" data-tooltip="serverName для REALITY.">
+                        </span>
+                    </label>
+                    <input id="b_sni" placeholder="example.com">
+
+                    <label>Fingerprint</label>
+                    <select id="b_fp">
+                        <option value="chrome">chrome</option>
+                        <option value="firefox">firefox</option>
+                        <option value="safari">safari</option>
+                    </select>
+
+                </div>
+
+                <!-- ================= ACTION ================= -->
+
+                <div class="builder-section">
+                    <button class="primary" onclick="buildVLESS()">Собрать VLESS</button>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+                <div>
+                    <h3 class="with-info">
+                        Сгенерированные ссылки
+                        <span class="info-icon"
+                            data-tooltip="Здесь отображаются сформированные VLESS URI. Можно скопировать, скачать .txt или проверить доступность сервера.">
+                        </span>
+                    </h3>
+                    <div style="font-size:13px;margin-top:4px;">
+                        Найдено: <span id="linkCount">0</span>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="secondary" onclick="copyResult()">📋 Копировать</button>
+                    <button class="secondary" onclick="downloadTxt()">⬇ Скачать .txt</button>
+                    <button class="primary" onclick="pingAll()">📡 Ping</button>
+                </div>
+            </div>
+
+            <div class="output" id="output" style="margin-top:10px;"></div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let links = [];
+
+        /* THEME */
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+        }
+
+        /* TOAST */
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 2000);
+        }
+
+        /* CLEAR */
+        function clearJSON() {
+            document.getElementById("jsonInput").value = "";
+        }
+
+        function clearSubscription() {
+            document.getElementById("subUrl").value = "";
+        }
+
+        function clearAll() {
+            links = [];
+            document.getElementById("jsonInput").value = "";
+            document.getElementById("subUrl").value = "";
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("linkCount").innerText = "0";
+            document.getElementById("pingResult").innerText = "—";
+            document.getElementById("b_uuid").value = "";
+            document.getElementById("b_address").value = "";
+            document.getElementById("b_port").value = "";
+            document.getElementById("b_remark").value = "";
+            document.getElementById("b_network").value = "tcp";
+            document.getElementById("b_security").value = "none";
+
+            document.getElementById("b_publicKey").value = "";
+            document.getElementById("b_shortId").value = "";
+            document.getElementById("b_sni").value = "";
+            document.getElementById("b_fp").value = "chrome";
+
+            document.getElementById("reality_block").style.display = "none";
+            showToast("Все поля очищены");
+        }
+
+        /* COPY */
+        function copyResult() {
+            if (!links.length) {
+                showToast("Нет данных");
+                return;
+            }
+
+            const text = links.map(l => {
+                const host = l.url.split("@")[1].split(":")[0];
+                return `${l.remark} | ${host}\n${l.url}`;
+            }).join("\n\n");
+
+            navigator.clipboard
+                .writeText(text)
+                .then(() => showToast("Скопировано"))
+                .catch(() => showToast("Ошибка копирования"));
+        }
+
+        /* DOWNLOAD */
+        function downloadTxt() {
+            if (!links.length) {
+                showToast("Нет данных");
+                return;
+            }
+
+            const text = links.map(l => {
+                const host = l.url.split("@")[1].split(":")[0];
+                return `${l.remark} | ${host}\n${l.url}`;
+            }).join("\n\n");
+
+            const blob = new Blob([text], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "vless-links.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            URL.revokeObjectURL(url);
+        }
+
+        /* SUBSCRIPTION */
+        async function processSubscription() {
+            try {
+
+                const url = document.getElementById("subUrl").value.trim();
+
+                if (!url) {
+                    showToast("Введите URL");
+                    return;
+                }
+
+                const res = await fetch("/api/subscription?url=" + encodeURIComponent(url));
+                const data = await res.json();
+
+                links = data.links.map(l => {
+                    const remark = decodeURIComponent(l.split("#")[1] || "");
+                    return { url: l, remark: remark || "Без региона" };
+                });
+
+                if (!links.length) {
+                    showToast("VLESS ссылки не найдены");
+                    return;
+                }
+
+                render();
+
+            } catch (e) {
+                console.error(e);
+                showToast("Ошибка загрузки подписки");
+            }
+        }
+
+        /* JSON PARSER */
+        function processJSON() {
+            try {
+                const raw = document.getElementById("jsonInput").value.trim();
+                if (!raw) {
+                    showToast("Вставьте JSON");
+                    return;
+                }
+
+                const json = JSON.parse(raw);
+
+                if (!Array.isArray(json.outbounds)) {
+                    showToast("outbounds не найден");
+                    return;
+                }
+
+                links = [];
+
+                for (const ob of json.outbounds) {
+
+                    if (ob.protocol !== "vless" && ob.type !== "vless") continue;
+
+                    const s = ob.settings || {};
+                    const stream = ob.streamSettings || {};
+
+                    let uuid, address, port, flow;
+
+                    /* Формат 1 — классический vnext */
+                    if (Array.isArray(s.vnext)) {
+                        address = s.vnext[0]?.address;
+                        port = s.vnext[0]?.port;
+                        uuid = s.vnext[0]?.users?.[0]?.id;
+                        flow = s.vnext[0]?.users?.[0]?.flow;
+                    }
+
+                    /* Формат 2 — мобильный (address/id напрямую) */
+                    else if (s.address && s.port && s.id) {
+                        address = s.address;
+                        port = s.port;
+                        uuid = s.id;
+                        flow = s.flow;
+                    }
+
+                    if (!uuid || !address || !port) continue;
+
+                    let params = new URLSearchParams();
+                    params.set("type", stream.network || "tcp");
+                    params.set("security", stream.security || "none");
+                    if (flow) params.set("flow", flow);
+
+                    if (stream.security === "reality") {
+                        const r = stream.realitySettings || {};
+                        if (r.serverName) params.set("sni", r.serverName);
+                        if (r.publicKey) params.set("pbk", r.publicKey);
+                        if (r.shortId) params.set("sid", r.shortId);
+                        if (r.fingerprint) params.set("fp", r.fingerprint);
+                    }
+
+                    const remark = json.remarks || ob.remarks || ob.tag || address;
+
+                    links.push({
+                        url: `vless://${uuid}@${address}:${port}?${params.toString()}#${encodeURIComponent(remark)}`,
+                        remark: remark
+                    });
+                }
+
+                if (!links.length) {
+                    showToast("VLESS не найден");
+                    return;
+                }
+
+                render();
+
+            } catch (e) {
+                showToast("Ошибка JSON: " + e.message);
+            }
+        }
+
+        /* RENDER */
+        function render() {
+
+            document.getElementById("linkCount").innerText = links.length;
+
+            const formatted = links.map(item => {
+
+                let pingText = "";
+
+                if (item.latency !== undefined) {
+
+                    if (item.latency === null) {
+                        pingText = '<span class="ping-bad">FAIL</span>';
+                    }
+                    else {
+
+                        let css = "ping-good";
+
+                        if (item.latency >= 100 && item.latency < 200) css = "ping-medium";
+                        else if (item.latency >= 200 && item.latency < 400) css = "ping-slow";
+                        else if (item.latency >= 400) css = "ping-bad";
+
+                        pingText = `<span class="${css}">${item.latency} ms</span>`;
+                    }
+
+                }
+
+                return `
+      <div style="margin-bottom:10px;">
+        <div style="font-size:13px; opacity:0.75; margin-bottom:2px;">
+          ${item.remark} ${pingText ? "| " + pingText : ""}
+        </div>
+        <div>
+          ${item.url.replace(
+                    "vless://",
+                    '<span class="scheme">vless://</span>'
+                )}
+        </div>
+      </div>
+    `;
+
+            }).join("");
+
+            document.getElementById("output").innerHTML = formatted;
+
+        }
+
+
+        /* HTTP PING */
+        async function pingHost(host) {
+            try {
+                const start = Date.now();
+                await fetch("https://" + host, { mode: "no-cors" });
+                return Date.now() - start;
+            } catch {
+                return null;
+            }
+        }
+
+        async function pingAll() {
+
+            if (!links.length) {
+                showToast("Нет ссылок");
+                return;
+            }
+
+            /* Показ checking... */
+            links.forEach(l => {
+                l.latency = "checking...";
+            });
+
+            render();
+
+            /* document.getElementById("pingResult").innerText = "..."; */
+
+            try {
+
+                const res = await fetch("/api/ping", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        links: links.map(l => l.url)
+                    })
+                });
+
+                const data = await res.json();
+
+                data.results.forEach((r, i) => {
+                    links[i].latency = r.latency;
+                });
+
+                render();
+
+            } catch (e) {
+
+                console.error(e);
+                showToast("Ошибка ping");
+
+            }
+
+        }
+
+
+
+        document.addEventListener("click", function (e) {
+
+            const icon = e.target.closest("[data-tooltip]");
+
+            // Удаляем старые тултипы
+            document.querySelectorAll(".tooltip-box")
+                .forEach(t => t.remove());
+
+            if (!icon) return;
+
+            const text = icon.getAttribute("data-tooltip");
+            if (!text) return;
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip-box";
+            tooltip.textContent = text;
+
+            document.body.appendChild(tooltip);
+
+            const rect = icon.getBoundingClientRect();
+
+            tooltip.style.top = (rect.bottom + window.scrollY + 8) + "px";
+
+            let left = rect.left + window.scrollX;
+
+            // если tooltip выходит за правый край
+            const maxRight = left + 260; // 260 = max-width tooltip
+            const screenWidth = window.innerWidth;
+
+            if (maxRight > screenWidth - 10) {
+                left = screenWidth - 270; // отступ от края
+            }
+
+            // если ушёл слишком влево
+            if (left < 10) {
+                left = 10;
+            }
+
+            tooltip.style.left = left + "px";
+
+            requestAnimationFrame(() => {
+                tooltip.classList.add("active");
+            });
+
+        });
+
+        /* ================= TAB LOGIC ================= */
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+
+                document.querySelectorAll(".tab-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                document.querySelectorAll(".tab-content")
+                    .forEach(c => c.classList.remove("active"));
+
+                btn.classList.add("active");
+
+                const id = btn.getAttribute("data-tab");
+                document.getElementById(id)
+                    .classList.add("active");
+            });
+        });
+        /* ================= UUID VALIDATION ================= */
+
+        function validateUUID(uuid) {
+            const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            return regex.test(uuid);
+        }
+
+        /* ================= GENERATE UUID ================= */
+
+        function generateUUID() {
+
+            const btn = event.currentTarget;
+            btn.classList.add("rotate");
+
+            setTimeout(() => btn.classList.remove("rotate"), 500);
+
+            const uuid = crypto.randomUUID();
+            document.getElementById("b_uuid").value = uuid;
+        }
+
+        /* ================= REALITY TOGGLE ================= */
+
+        function toggleRealityFields() {
+            const sec = document.getElementById("b_security").value;
+            document.getElementById("reality_block").style.display =
+                sec === "reality" ? "block" : "none";
+        }
+
+        /* ================= REALITY KEY GENERATOR ================= */
+
+        async function generateRealityKey() {
+
+            const btn = event.currentTarget;
+            btn.classList.add("rotate");
+
+            setTimeout(() => btn.classList.remove("rotate"), 500);
+
+            const keyPair = await crypto.subtle.generateKey(
+                { name: "X25519" },
+                true,
+                ["deriveKey"]
+            );
+
+            const raw = await crypto.subtle.exportKey("raw", keyPair.publicKey);
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
+
+            document.getElementById("b_publicKey").value = base64;
+        }
+
+        /* ================= BUILD VLESS ================= */
+
+        function buildVLESS() {
+
+            const uuid = document.getElementById("b_uuid").value.trim();
+            const address = document.getElementById("b_address").value.trim();
+            const port = document.getElementById("b_port").value.trim();
+            const remark = document.getElementById("b_remark").value.trim();
+            const network = document.getElementById("b_network").value;
+            const security = document.getElementById("b_security").value;
+
+            if (!uuid || !address || !port) {
+                showToast("UUID, Address и Port обязательны");
+                return;
+            }
+
+            if (!validateUUID(uuid)) {
+                showToast("UUID имеет неверный формат");
+                return;
+            }
+
+            let params = new URLSearchParams();
+            params.set("type", network);
+            params.set("security", security);
+
+            if (security === "reality") {
+                const pk = document.getElementById("b_publicKey").value.trim();
+                const sid = document.getElementById("b_shortId").value.trim();
+                const sni = document.getElementById("b_sni").value.trim();
+                const fp = document.getElementById("b_fp").value;
+
+                if (pk) params.set("pbk", pk);
+                if (sid) params.set("sid", sid);
+                if (sni) params.set("sni", sni);
+                if (fp) params.set("fp", fp);
+            }
+
+            const url =
+                `vless://${uuid}@${address}:${port}?${params.toString()}#${encodeURIComponent(remark || "Builder")}`;
+
+            links.push({
+                url: url,
+                remark: remark || "Builder"
+            });
+
+            render();
+            showToast("VLESS добавлен");
+        }
+    </script>
+</body>
+
+</html>
