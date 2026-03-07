@@ -880,7 +880,7 @@
                     return;
                 }
 
-                const res = await fetch("/api/subscription?url=" + encodeURIComponent(url));
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/subscription?url=" + encodeURIComponent(url));
                 const data = await res.json();
 
                 links = data.links.map(l => {
@@ -1056,7 +1056,7 @@
 
             try {
 
-                const res = await fetch("/api/ping", {
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/ping", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
