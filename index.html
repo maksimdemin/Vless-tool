@@ -375,6 +375,7 @@
 
         .tab-btn:active {
             transform: scale(0.97);
+            background: transparent;
         }
 
         .tab-content {
@@ -387,6 +388,10 @@
 
         .tab-btn:hover {
             background: rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn:focus {
+            outline: none;
         }
 
         /* ===== MOBILE ===== */
@@ -466,9 +471,9 @@
             padding: 0;
 
             background: transparent;
-            border: 1px solid var(--border);
+            border: none;
             border-radius: 8px;
-
+            cursor: pointer;
             font-size: 20px;
         }
 
@@ -482,7 +487,7 @@
 
         /* ===== GENERATE BUTTON ANIMATION ===== */
 
-        .rotate {
+        /* .rotate {
             animation: spin .5s linear;
         }
 
@@ -494,7 +499,9 @@
             to {
                 transform: rotate(360deg);
             }
-        }
+        } */
+
+
 
         .link-item {
             margin: 14px 0;
@@ -1160,10 +1167,10 @@
 
         function generateUUID() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const uuid = crypto.randomUUID();
             document.getElementById("b_uuid").value = uuid;
@@ -1181,10 +1188,10 @@
 
         async function generateRealityKey() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const keyPair = await crypto.subtle.generateKey(
                 { name: "X25519" },
