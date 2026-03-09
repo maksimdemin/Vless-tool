@@ -849,15 +849,28 @@
 
         /* COPY */
         function copyResult() {
+
             if (!links.length) {
                 showToast("Нет данных");
                 return;
             }
 
-            const text = links.map(l => {
-                const host = l.url.split("@")[1].split(":")[0];
-                return `${l.remark} | ${host}\n${l.url}`;
-            }).join("\n\n");
+            let text;
+
+            // если ссылка одна
+            if (links.length === 1) {
+
+                text = links[0].url.split("#")[0];
+
+            } else {
+
+                // если ссылок несколько
+                text = links.map(l => {
+                    const host = l.url.split("@")[1].split(":")[0];
+                    return `${l.remark} | ${host}\n${l.url}`;
+                }).join("\n\n");
+
+            }
 
             navigator.clipboard
                 .writeText(text)
