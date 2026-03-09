@@ -364,7 +364,7 @@
             font-weight: 500;
             color: #3b82f6;
             transition: all .15s ease;
-            -webkit-tap-highlight-color: transparent;
+            /* -webkit-tap-highlight-color: transparent; */
             user-select: none;
         }
 
@@ -386,11 +386,12 @@
             display: block;
         }
 
-        .tab-btn:hover {
+        .tab-btn:hover:not(.active) {
             background: rgba(0, 0, 0, 0.05);
         }
 
-        .tab-btn:focus {
+        .tab-btn:focus,
+        .tab-btn:focus-visible {
             outline: none;
         }
 
@@ -816,7 +817,7 @@
             document.getElementById("subUrl").value = "";
             document.getElementById("output").innerHTML = "";
             document.getElementById("linkCount").innerText = "0";
-            document.getElementById("pingResult").innerText = "—";
+            // document.getElementById("pingResult").innerText = "—";
             document.getElementById("b_uuid").value = "";
             document.getElementById("b_address").value = "";
             document.getElementById("b_port").value = "";
