@@ -364,7 +364,7 @@
             font-weight: 500;
             color: #3b82f6;
             transition: all .15s ease;
-            -webkit-tap-highlight-color: transparent;
+            /* -webkit-tap-highlight-color: transparent; */
             user-select: none;
         }
 
@@ -375,6 +375,7 @@
 
         .tab-btn:active {
             transform: scale(0.97);
+            background: transparent;
         }
 
         .tab-content {
@@ -385,8 +386,13 @@
             display: block;
         }
 
-        .tab-btn:hover {
+        .tab-btn:hover:not(.active) {
             background: rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn:focus,
+        .tab-btn:focus-visible {
+            outline: none;
         }
 
         /* ===== MOBILE ===== */
@@ -466,9 +472,9 @@
             padding: 0;
 
             background: transparent;
-            border: 1px solid var(--border);
+            border: none;
             border-radius: 8px;
-
+            cursor: pointer;
             font-size: 20px;
         }
 
@@ -482,7 +488,7 @@
 
         /* ===== GENERATE BUTTON ANIMATION ===== */
 
-        .rotate {
+        /* .rotate {
             animation: spin .5s linear;
         }
 
@@ -494,7 +500,9 @@
             to {
                 transform: rotate(360deg);
             }
-        }
+        } */
+
+
 
         .link-item {
             margin: 14px 0;
@@ -809,7 +817,7 @@
             document.getElementById("subUrl").value = "";
             document.getElementById("output").innerHTML = "";
             document.getElementById("linkCount").innerText = "0";
-            document.getElementById("pingResult").innerText = "—";
+            // document.getElementById("pingResult").innerText = "—";
             document.getElementById("b_uuid").value = "";
             document.getElementById("b_address").value = "";
             document.getElementById("b_port").value = "";
@@ -880,7 +888,7 @@
                     return;
                 }
 
-                const res = await fetch("/api/subscription?url=" + encodeURIComponent(url));
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/subscription?url=" + encodeURIComponent(url));
                 const data = await res.json();
 
                 links = data.links.map(l => {
@@ -1056,7 +1064,7 @@
 
             try {
 
-                const res = await fetch("/api/ping", {
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/ping", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1160,10 +1168,10 @@
 
         function generateUUID() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const uuid = crypto.randomUUID();
             document.getElementById("b_uuid").value = uuid;
@@ -1181,10 +1189,10 @@
 
         async function generateRealityKey() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const keyPair = await crypto.subtle.generateKey(
                 { name: "X25519" },
