@@ -65,10 +65,10 @@
             background: var(--accent);
             border: none;
             color: white;
-            padding: 5px 8px;
+            padding: 6px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 18px;
         }
 
         .container {
@@ -430,7 +430,9 @@
 
         .builder-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            align-items: center;
+            flex: 1;
         }
 
         /* ===== BUILDER FORM ALIGN ===== */
@@ -464,6 +466,17 @@
 
         .builder-row input {
             flex: 1;
+            height: 38px;
+        }
+
+        .builder-row .secondary {
+            height: 38px;
+            width: 38px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
 
         .builder-row button {
@@ -646,7 +659,7 @@
                     </label>
 
                     <div class="builder-row">
-                        <input id="b_uuid" placeholder="Вставьте UUID или сгенерируйте">
+                        <input id="b_uuid" placeholder="UUID или сгенерируйте">
                         <button type="button" class="secondary" onclick="generateUUID()"
                             title="Сгенерировать UUID">🔄</button>
                     </div>
@@ -722,7 +735,7 @@
                     </label>
 
                     <div class="builder-row">
-                        <input id="b_publicKey" placeholder="BASE64 PUBLIC KEY">
+                        <input id="b_publicKey" placeholder="Public key или сгенерируйте">
                         <button type="button" class="secondary" onclick="generateRealityKey()"
                             title="Сгенерировать Public Key">🔄</button>
                     </div>
