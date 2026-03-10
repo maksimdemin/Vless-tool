@@ -482,7 +482,7 @@
 
         /* ===== GENERATE BUTTON ANIMATION ===== */
 
-        .rotate {
+        /* .rotate {
             animation: spin .5s linear;
         }
 
@@ -494,10 +494,21 @@
             to {
                 transform: rotate(360deg);
             }
-        }
+        } */
 
         .link-item {
             margin: 14px 0;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .link-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .link-item:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .link-meta {
@@ -869,7 +880,7 @@
                     return;
                 }
 
-                const res = await fetch("/api/subscription?url=" + encodeURIComponent(url));
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/subscription?url=" + encodeURIComponent(url));
                 const data = await res.json();
 
                 links = data.links.map(l => {
@@ -996,7 +1007,7 @@
                 }
 
                 return `
-      <div style="margin-bottom:10px;">
+      <div class ="link-item">
         <div style="font-size:13px; opacity:0.75; margin-bottom:2px;">
           ${item.remark} ${pingText ? "| " + pingText : ""}
         </div>
@@ -1045,7 +1056,7 @@
 
             try {
 
-                const res = await fetch("/api/ping", {
+                const res = await fetch("https://maksimdemin.github.io/Vless-tool//api/ping", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1149,10 +1160,10 @@
 
         function generateUUID() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const uuid = crypto.randomUUID();
             document.getElementById("b_uuid").value = uuid;
@@ -1170,10 +1181,10 @@
 
         async function generateRealityKey() {
 
-            const btn = event.currentTarget;
-            btn.classList.add("rotate");
+            // const btn = event.currentTarget;
+            // btn.classList.add("rotate");
 
-            setTimeout(() => btn.classList.remove("rotate"), 500);
+            // setTimeout(() => btn.classList.remove("rotate"), 500);
 
             const keyPair = await crypto.subtle.generateKey(
                 { name: "X25519" },
